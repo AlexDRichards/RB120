@@ -4,13 +4,18 @@ class Player
     set_name
     @choice = choice
   end
-
 end
 
 class Computer < Player
   POSSIBLE_OPPONENTS = ['R2D2', 'Deep Blue', 'Alfred']
+  POSSIBLE_CHOICES = ['rock', 'paper', 'scissors']
   def set_name
     self.name = POSSIBLE_OPPONENTS.sample
+  end
+
+  def choice
+    self.choice = POSSIBLE_CHOICES.sample
+    self.choice
   end
 end
 
@@ -25,6 +30,19 @@ class Human < Player
     end
     self.name = n
   end
+
+  def choose
+    options = ['rock','paper','scissors']
+    choice = ''
+    loop do
+      puts "What's your choice? (rock, paper, or scissors)"
+      choice = gets.chomp
+      break if options.include?(choice)
+      puts "I'm sorry, please check your spelling"
+    end
+    self.choice = choice
+  end
+
 end
 
 class Game
@@ -36,8 +54,9 @@ class Game
   end
 
   def play
+    puts "Welcome to the game"
     # loop do
-      human.choice
+      human.choose
       computer.choice
       # declare_winner
       # play_again?
@@ -46,4 +65,4 @@ class Game
   end
 end
 
-Game.new
+Game.new.play
