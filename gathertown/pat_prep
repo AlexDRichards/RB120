@@ -1,0 +1,33 @@
+class Fruit
+  def initialize(name)
+    @name = name 
+  end 
+
+  def to_s
+    name
+  end
+
+  def compare(other)
+    p "Whose method? #{self}"
+    p "I'm a #{type}" 
+    p "Who else do we want the type of? #{other}"
+    p "You are a #{other.type}"
+  end
+
+  protected
+  def type 
+    self.name 
+  end 
+
+  private
+
+  attr_reader :name
+end
+
+apple = Fruit.new("apple")
+orange = Fruit.new("orange")
+
+p self
+p apple.compare(orange)
+# p apple.type
+# p apple.name
