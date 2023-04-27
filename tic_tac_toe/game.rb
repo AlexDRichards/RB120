@@ -117,6 +117,19 @@ class TTTGame
         @board = Board.new
         @human = Player.new(HUMAN_MARKER)
         @computer = Player.new(COMPUTER_MARKER)
+        @current_state = HUMAN_MARKER
+    end
+    
+    def current_player_moves
+        case @current_state
+        when HUMAN_MARKER
+            @current_state = COMPUTER_MARKER
+            human_moves
+        when COMPUTER_MARKER
+            @current_state = HUMAN_MARKER
+            computer_moves
+        end
+
     end
 
     def display_welcome_message
@@ -186,11 +199,9 @@ class TTTGame
         loop do 
             board.draw
             loop do
-                human_moves
+                current_player_moves
                 break if board.someone_won? || board.full?
-                computer_moves
-                break if board.someone_won? || board.full?
-                board.draw
+                board.draw if @current_state == HUMAN_MARKER
             end
             display_result
             break if !play_again?
