@@ -161,6 +161,25 @@ class TwentyOne
         @human.stay && @computer.stay 
     end
 
+    def display_results
+        puts "Player has #{@human.total} points!"
+        puts "Computer has #{@computer.total} points!"
+    end
+
+    def declare_winner
+        player_score = @human.total
+        computer_score = @computer.total
+
+        case
+        when player_score > 21 then puts "Player busts! Computer won!"
+        when computer_score > 21 then puts "Computer busts! Player won!"
+        when player_score > computer_score then puts "Player won!"
+        when player_score < computer_score then puts "Computer won!"
+        else
+            puts "Tie!"
+        end
+    end
+
     def play
         deal_cards
         loop do
@@ -171,7 +190,8 @@ class TwentyOne
             break if bust_check
             break if stay_check
         end
-        # display_winner
+        display_results
+        declare_winner
         # play_again?
     end 
 end
