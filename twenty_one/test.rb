@@ -1,5 +1,4 @@
-
-module DeckMaker
+module DeckTools
     def deck_maker
       deck = []
       types = %w(h s c d)
@@ -14,10 +13,40 @@ module DeckMaker
         end
       deck
     end
+
+    def translate(card)
+        # card = [value, type]
+        value = card[0]
+        type = card[1]
+        value_chart = {
+            1 => 'one',
+            2 => 'two',
+            3 => 'three',
+            4 => 'four',
+            5 => 'five',
+            6 => 'six',
+            7 => 'seven',
+            8 => 'eight',
+            9 => 'nine',
+            'j' => 'jack',
+            'q' => 'queen',
+            'k' => 'king',
+            'a' => 'ace'
+        }
+    
+        type_chart = {
+          's' => 'spades',
+          'd' => 'diamonds',
+          'c' => 'clubs',
+          'h' => 'hearts',
+        }
+        # YOU should be the player object in question
+        "#{value_chart[value].upcase} of #{type_chart[type].upcase}"
+    end
 end
 
 class Deck
-    include DeckMaker
+    include DeckTools
     attr_accessor :cards
     def initialize
         @cards = deck_maker
@@ -30,25 +59,58 @@ class Deck
     end
 end
 
-class Player
+class Player < Deck
+    attr_accessor :hand, :stay
+    include DeckTools
+    def total
+        sum = 0
+        @hand.each do |card|
+            if card[0].is_a?(Integer)
+                sum += card[0]
+            elsif card[0] == 'a'
+                sum += 11
+            else
+                sum += 10
+            end
+        end
+        case sum > 21 && @hand.flatten.include?('a')
+        when true then sum -= 10
+        when false then sum
+        end
+    end
+
+    def display_hand
+        @hand.each_with_index do |card, loc|
+            puts "  Card #{loc + 1}:" + " #{translate(card)}"
+        end
+        puts "  Hand Total: #{total}"
+    end
 end
 
 class Human < Player
-    attr_accessor :hand
     def initialize
         @hand = []
     end
 end
 
 class Computer < Player
-    attr_accessor :hand
     def initialize
         @hand = []
     end
+
+    def choice
+        choice = ''
+        case
+        when self.total >= 17
+            choice = 'stay'
+        when self.total <= 16
+            choice = 'hit'
+        end
+    end 
 end
 
 
-class TwentyOne
+class TwentyOne 
     def initialize
         @deck = Deck.new
         @human = Human.new
@@ -62,16 +124,56 @@ class TwentyOne
         @computer.hand << @deck.deal
     end
 
+    def show_initial_hand
+        puts "Your hand:"
+        @human.display_hand
+        puts "Your opponent's hand:"
+        @computer.display_hand
+    end
+
+    def player_turn
+        answer = ''
+        loop do
+            puts "Would you like to hit or stay?(h/s)"
+            answer = gets.chomp.downcase
+            break if %w(h s).include?(answer)
+            puts "I'm sorry, please check your typing and try again."
+        end
+        case answer
+        when 'h' then @human.hand << @deck.deal
+        when 's' then @human.stay = true
+        end
+    end
+
+    def computer_turn
+        decision = @computer.choice
+        case decision
+        when 'hit' then @computer.hand << @deck.deal
+        when 'stay' then @computer.stay = true
+        end
+    end
+
+    def bust_check
+        @human.total > 21 || @computer.total > 21
+    end
+
+    def stay_check
+        @human.stay && @computer.stay 
+    end
+
     def play
         deal_cards
-        # show_hand
-        # player_turn
-        # computer_turn
+        loop do
+            show_initial_hand
+            player_turn
+            break if bust_check
+            computer_turn
+            break if bust_check
+            break if stay_check
+        end
         # display_winner
         # play_again?
     end 
 end
 
 TwentyOne.new.play
-
-TwentyOne.new
