@@ -35,11 +35,89 @@ Card
 Game
 =end
 
-=begin 
-class Player
+
+module DeckMaker
+  def deck_maker
+    deck = []
+    types = %w(h s c d)
+    high_cards = %w(j q k a)
+    types.each do |type|
+      (1..9).each do |num|
+        deck << [num, type]
+      end
+      high_cards.each do |face|
+        deck << [face, type]
+      end
+    end
+    deck
+  end
+end
+
+module CardDecoder
+  def translate(card)
+    # card = [value, type]
+    value = card[0]
+    type = card[1]
+    value_chart = {
+        1 => 'one',
+        2 => 'two',
+        3 => 'three',
+        4 => 'four',
+        5 => 'five',
+        6 => 'six',
+        7 => 'seven',
+        8 => 'eight',
+        9 => 'nine',
+        'j' => 'jack',
+        'q' => 'queen',
+        'k' => 'king',
+        'a' => 'ace'
+    }
+
+    type_chart = {
+      's' => 'spades',
+      'd' => 'diamonds',
+      'c' => 'clubs',
+      'h' => 'hearts',
+    }
+    # YOU should be the player object in question
+    "#{value_chart[value].upcase} of #{type_chart[type].upcase}"
+  end
+end
+
+class Deck
+  include CardDecoder
+  include DeckMaker
+  attr_accessor :deck
+
+  # deck structure:
+    # DECK => []
+    # CARD => [[value, type]]
+ 
+
   def initialize
-    # what would the "data" or "states" of a Player object entail?
-    # maybe cards? a name?
+    @deck = deck_maker
+    @human = Player.new
+    @comptuer = Player.new
+  end
+  
+  def deal
+    card_1 = @deck.sample
+    @deck.delete(card_1)
+    card_2 = @deck.sample
+    @deck.delete(card_2)
+    [card_1, card_2]
+  end
+
+  def size
+    @deck.size
+  end
+
+end
+
+class Player < Deck
+  attr_accessor :hand
+  def initialize
   end
 
   def hit
@@ -56,6 +134,45 @@ class Player
   end
 end
 
+
+class Game
+  def initialize
+    @deck = Deck.new
+    @human = Player.new
+    @computer = Player.new
+  end
+
+  def welcome_message
+    puts "********************"
+    puts "WELCOME TO TWENTY ONE"
+    puts "********************"
+  end
+
+  def deal_cards
+    @human.hand = @deck.deal
+    @computer.hand = @deck.deal
+  end
+
+  def show_initial_cards
+    puts "Human has #{@deck.translate(@human.hand[0])} and a #{@deck.translate(@human.hand[1])}"
+    puts "Computer has a #{@deck.translate(@computer.hand[0])} and a MYSTERIOUS CARD!"
+  end
+  def start
+    welcome_message
+    deal_cards
+    show_initial_cards
+    # player_turn
+    # dealer_turn
+    # show_result
+  end
+end
+
+Game.new.start
+
+#############
+
+=begin
+# UNUSED CLASSES #
 class Dealer
   def initialize
     # seems like very similar to Player... do we even need this?
@@ -77,33 +194,4 @@ class Dealer
   def total
   end
 end
-
-class Participant
-  # what goes in here? all the redundant behaviors from Player and Dealer?
-end
-
-class Deck
-  def initialize
-    # obviously, we need some data structure to keep track of cards
-    # array, hash, something else?
-  end
-
-  def deal
-    # does the dealer or the deck deal?
-  end
-end
-
-class Card
-  def initialize
-    # what are the "states" of a card?
-  end
-end
-
-class Game
-  def start
-    # what's the sequence of steps to execute the game play?
-  end
-end
-
-Game.new.start
 =end
