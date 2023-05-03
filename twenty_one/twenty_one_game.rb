@@ -28,6 +28,7 @@ module DeckTools
             7 => 'seven',
             8 => 'eight',
             9 => 'nine',
+            10 => 'ten',
             'j' => 'jack',
             'q' => 'queen',
             'k' => 'king',
