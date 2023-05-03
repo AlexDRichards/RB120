@@ -6,6 +6,8 @@ Here is an overview of the game:
 - Both participants are initially dealt 2 cards from a 52-card deck.
 - The player takes the first turn, and can "hit" or "stay".
 - If the player busts, he loses. If he stays, it's the dealer's turn.
+  - requires a 'bust' check
+  - stay will break the loop
 - The dealer must hit until his cards add up to at least 17.
 - If he busts, the player wins. If both player and dealer stays, then the highest total wins.
 - If both totals are equal, then it's a tie, and nobody wins.
@@ -83,6 +85,19 @@ module CardDecoder
     # YOU should be the player object in question
     "#{value_chart[value].upcase} of #{type_chart[type].upcase}"
   end
+
+  def calculate_value(card)
+    if card[0].is_a?(Integer)
+      card[0]
+    elsif card[0].is_a?(String)
+      if card[0] == 'a'
+        #check total... if 20, return value of 1
+        #else 11
+      else
+        10
+      end
+    end
+  end
 end
 
 class Deck
@@ -93,12 +108,9 @@ class Deck
   # deck structure:
     # DECK => []
     # CARD => [[value, type]]
- 
 
   def initialize
     @deck = deck_maker
-    @human = Player.new
-    @comptuer = Player.new
   end
   
   def deal
@@ -109,11 +121,18 @@ class Deck
     [card_1, card_2]
   end
 
+  def deal_one
+    card = deck.sample
+    deck.delete(card)
+  end
+
   def size
     @deck.size
   end
 
 end
+
+# I'm trying to display the hand once another card has been added
 
 class Player < Deck
   attr_accessor :hand
@@ -121,6 +140,7 @@ class Player < Deck
   end
 
   def hit
+    p @deck.deck.deal_one
   end
 
   def stay
@@ -130,8 +150,13 @@ class Player < Deck
   end
 
   def total
-    # definitely looks like we need to know about "cards" to produce some total
+
   end
+
+  def display_hand
+    p @hand
+  end
+
 end
 
 
@@ -157,11 +182,22 @@ class Game
     puts "Human has #{@deck.translate(@human.hand[0])} and a #{@deck.translate(@human.hand[1])}"
     puts "Computer has a #{@deck.translate(@computer.hand[0])} and a MYSTERIOUS CARD!"
   end
+
+  def player_turn
+    puts "Your hand's value is ______________. Would you like to hit or stay? (h/s)"
+    player_answer = gets.chomp
+    case player_answer
+    when 'h' then @human.hit
+    when 's' then #<METHOD>
+    end
+    @human.display_hand
+  end
+
   def start
     welcome_message
     deal_cards
     show_initial_cards
-    # player_turn
+    player_turn
     # dealer_turn
     # show_result
   end

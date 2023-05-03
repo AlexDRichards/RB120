@@ -78,6 +78,15 @@ class Player < Deck
         when false then sum
         end
     end
+end
+
+class Human < Player
+    attr_accessor :name
+    def initialize
+        @hand = []
+        puts "What's your name, player?"
+        @name = gets.chomp
+    end
 
     def display_hand
         @hand.each_with_index do |card, loc|
@@ -87,15 +96,11 @@ class Player < Deck
     end
 end
 
-class Human < Player
-    def initialize
-        @hand = []
-    end
-end
-
 class Computer < Player
+    attr_accessor :name
     def initialize
         @hand = []
+        @name = ['Deep Blue', 'Watson','Siri'].sample
     end
 
     def choice
@@ -107,6 +112,17 @@ class Computer < Player
             choice = 'hit'
         end
     end 
+
+    def display_hand
+        concealed_cards = []
+        @hand.each_with_index do |card, _|
+            concealed_cards << card
+        end
+        puts "  Card 1: MYSTERY CARD."
+        concealed_cards[1..-1].each_with_index do |card, loc|
+            puts "  Card #{loc + 2}:" + " #{translate(card)}"
+        end
+    end
 end
 
 
@@ -125,9 +141,9 @@ class TwentyOne
     end
 
     def show_initial_hand
-        puts "Your hand:"
+        puts "#{@human.name}'s hand:"
         @human.display_hand
-        puts "Your opponent's hand:"
+        puts "#{@computer.name}'s hand:"
         @computer.display_hand
     end
 
@@ -162,8 +178,8 @@ class TwentyOne
     end
 
     def display_results
-        puts "Player has #{@human.total} points!"
-        puts "Computer has #{@computer.total} points!"
+        puts "#{@human.name} has #{@human.total} points!"
+        puts "#{@computer.name} has #{@computer.total} points!"
     end
 
     def declare_winner
@@ -180,19 +196,45 @@ class TwentyOne
         end
     end
 
-    def play
-        deal_cards
+    def play_again?
+        answer = nil
         loop do
-            show_initial_hand
-            player_turn
-            break if bust_check
-            computer_turn
-            break if bust_check
-            break if stay_check
+            puts "Would you like to play again?"
+            answer = gets.chomp
+            break if %w(y n).include?(answer.downcase)
+            puts "Please try your input again."
         end
-        display_results
-        declare_winner
-        # play_again?
+        answer == 'y'
+    end
+
+    def reset_game
+        @deck = Deck.new
+        @human = Human.new
+        @computer = Computer.new
+    end
+
+    def goodbye_message
+        puts "Thanks for playing Twenty-One!"
+        puts "GOODBYE!"
+    end
+
+    def play
+        loop do
+            deal_cards
+            loop do
+                show_initial_hand
+                player_turn
+                break if bust_check
+                computer_turn
+                break if bust_check
+                break if stay_check
+            end
+            display_results
+            declare_winner
+            break if !play_again?
+            reset_game
+        end
+        goodbye_message
     end 
 end
 
