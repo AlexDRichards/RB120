@@ -4,7 +4,7 @@ class Piano
     end
 
     def same?(other_piano)
-        type == other_piano.type
+        p type #== other_piano.type
     end
 
     private
@@ -25,3 +25,11 @@ p stienway.same?(baldwin)
 # passed the object baldwin, which then tries to
 # call steinway.type, but since it's private, it won't work
 # if it were protected, it would work, also if public
+
+# UPDATE
+
+# The above answer isn't accurate.
+# The steinway object could indeed access :type becuase it would be doing so 
+# via an interface that is within the class #Piano
+# The reason why the error is thrown is because the object, baldwin
+# is trying to use :type from within the steinway object's class

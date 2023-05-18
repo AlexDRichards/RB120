@@ -8,7 +8,7 @@ class Student
       self.id == other.id
     end
   
-    private
+    protected
     
     attr_reader :id, :name
   end
@@ -16,4 +16,4 @@ class Student
   rob = Student.new(123, "Rob")
   tom = Student.new(456, "Tom")
   
-  rob == tom
+  p rob == tom

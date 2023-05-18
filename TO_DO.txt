@@ -1,0 +1,10 @@
+May 18th
+
+TWENTY-ONE
+- fix name.getter so that it doesn't take spaces # done
+- fix play.again so name isn' required a second time # done
+
+EXAM PREP
+- study the challenge problems by LS student in Medium article
+- attend seminar by Trevor
+
