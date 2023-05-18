@@ -1,3 +1,53 @@
+module ComputerMind
+    def opening?(line, board)
+        line.each do |pos|
+          return false if board[pos - 1] == 'O'
+        end
+        true
+    end
+  
+    def threat_assessor(board, available_spots)
+        # the array is such that:
+            # state[0] | state[1] | state[2]
+            # state[3] | state[4] | state[5]
+            # state[6] | state[7] | state[8]
+        # so assessing threat will require going through winning lines
+        # and finding how many of those winning lines has an X for two 
+            # of the three positions
+        # LINES: lines = [[1,2,3], [1,4,7],[1,5,9],[4,5,6],[2,5,8],[7,8,9],[7,5,3],[3,6,9]]
+            # iterate through these winning lines
+                # if state[ln_num - 1] == 'X'
+                    # increment threat counter by 1
+                # the moment threat counter == 2
+                    # select and return the position whose state is ' '
+                # that position is the computer's choice
+                # if iteration completes and threat never hits 2, make a random
+                # selection
+            #
+        #
+        lines = [[1,2,3], [1,4,7],[1,5,9],[4,5,6],[2,5,8],[7,8,9],[7,5,3],[3,6,9]]
+        
+        lines.each do |line|
+          threat_counter = 0
+          danger_line = nil
+          line.each do |position|
+            if board[position - 1] == 'X'
+              threat_counter += 1
+            end
+            if threat_counter >= 2 && opening?(line, board)
+              danger_line = line
+              break
+            end
+          end
+            if threat_counter >= 2 && opening?(line, board)
+              computer_choice = danger_line.select{|position| board[position-1] == ' '}[0]
+              return computer_choice
+            end 
+        end
+        return available_spots.sample
+    end
+end
+
 class Board
     attr_accessor :state
 
@@ -41,6 +91,7 @@ class Board
             return 'X' if values.all?('X')
             return 'O' if values.all?('O')
         end
+        return 'T' if available_spots == []
         false
     end
 
@@ -69,6 +120,7 @@ class Human
 end
 
 class Computer
+    include ComputerMind
     MARKER = 'O'
     attr_accessor :name
 
@@ -138,8 +190,8 @@ class TTTgame
 
     def computer_turn
         options = @board.available_spots
-        answer = options.sample
-        @board.mark_spot(answer, @computer.marker)
+        answer = @computer.threat_assessor(@board.state, options)
+        @board.mark_spot(answer, 'O')
     end
 
     def win_check
@@ -163,6 +215,8 @@ class TTTgame
                 puts "Player wins!"
             when 'O'
                 puts "Computer wins!"
+            else
+                puts "TIE!"
         end
     end
 
@@ -181,15 +235,16 @@ class TTTgame
             loop do
                 display_board
                 player_turn
-                display_board
                 break if win_check
                 computer_turn
                 break if win_check
             end
+            display_board
             display_winner
             break if !play_again?
             reset_game
         end
+        display_board
         display_goodbye
     end
 end
