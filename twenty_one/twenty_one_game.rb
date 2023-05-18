@@ -1,3 +1,14 @@
+module StringTools
+   
+   def name_check_pass?(name)
+       alpha = ('a'..'z').to_a
+       name.chars.each do |ltr|
+        return true if alpha.include?(ltr)
+       end
+       false
+   end
+end
+
 module DeckTools
     def deck_maker
       deck = []
@@ -85,8 +96,6 @@ class Human < Player
     attr_accessor :name
     def initialize
         @hand = []
-        puts "What's your name, player?"
-        @name = gets.chomp
     end
 
     def display_hand
@@ -127,11 +136,23 @@ class Computer < Player
 end
 
 
-class TwentyOne 
+class TwentyOne
+    include StringTools
     def initialize
         @deck = Deck.new
         @human = Human.new
         @computer = Computer.new
+    end
+    
+    def set_player_name
+        name = nil
+        loop do
+          puts "What's your name, player?"
+          name = gets.chomp
+          break if name_check_pass?(name)
+          puts "Sorry, please try putting your name in again"
+        end
+        @human.name = name
     end
 
     def deal_cards
@@ -200,7 +221,7 @@ class TwentyOne
     def play_again?
         answer = nil
         loop do
-            puts "Would you like to play again?"
+            puts "Would you like to play again?(y/n)"
             answer = gets.chomp
             break if %w(y n).include?(answer.downcase)
             puts "Please try your input again."
@@ -210,7 +231,6 @@ class TwentyOne
 
     def reset_game
         @deck = Deck.new
-        @human = Human.new
         @computer = Computer.new
     end
 
@@ -220,6 +240,7 @@ class TwentyOne
     end
 
     def play
+        set_player_name
         loop do
             deal_cards
             loop do
